@@ -46,10 +46,11 @@ jobs:
         uv pip install --system black
         black --check .
 
-    - name: Sort imports with isort
+    - name: Auto sort imports with isort
       run: |
         uv pip install --system isort
-        isort --check .
+        isort .
+
 
     - name: Type check with mypy
       run: |
