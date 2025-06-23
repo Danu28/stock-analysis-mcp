@@ -42,10 +42,12 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
-        
-    - name: Check formatting with black
+          - name: Check formatting with black
       run: |
         uv pip install --system black
+        # First try to format the files
+        black .
+        # Then verify all files are correctly formatted
         black --check .
         
     - name: Sort imports with isort

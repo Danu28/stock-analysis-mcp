@@ -8,12 +8,14 @@ import sys
 import main
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, 
-                       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
     logger = logging.getLogger(__name__)
-    
+
     logger.info("Starting Stock Price MCP Server...")
-    
+
     try:
         main.mcp.run()
         logger.info("Server started successfully")
