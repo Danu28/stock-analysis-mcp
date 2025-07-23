@@ -1,24 +1,145 @@
-# Stock Analysis Tool
+# Stock Analysis MCP Server
 
-A comprehensive stock analysis tool that provides portfolio optimization, technical analysis, and real-time stock price data for NSE (India) listed stocks.
+A comprehensive **Model Context Protocol (MCP) server** for stock analysis, portfolio optimization, and technical analysis focused on Indian stock markets (NSE/BSE). Built with configurable JSON files for easy customization and deployment.
 
-## Features
+## 🚀 Features
 
-- **Portfolio Optimization**: Optimize portfolio allocation using Modern Portfolio Theory
-- **Real-time Stock Prices**: Get current stock prices for NSE listed companies
-- **Historical Data**: Fetch and analyze historical stock data
-- **Technical Analysis**: Generate technical analysis prompts and insights
-- **Stock Comparison**: Compare multiple stocks side by side
-- **MCP Server**: Built as a Model Context Protocol server for integration with AI assistants
+- **📊 Portfolio Optimization**: Modern Portfolio Theory with Sharpe ratio optimization
+- **💰 Real-time Stock Prices**: Current prices for NSE/BSE listed companies  
+- **📈 Historical Data Analysis**: Fetch and analyze historical stock data
+- **🔍 Technical Analysis**: Generate detailed technical analysis reports
+- **📋 Predefined Watchlists**: Nifty50, BankNifty, IT stocks, Pharma stocks, and more
+- **⚙️ JSON Configuration**: Easy customization via config files
+- **🤖 MCP Integration**: Seamless integration with AI assistants like Claude
+- **🔄 Caching**: LRU caching for improved performance
+
+## 📦 Quick Start
+
+### Installation
+```bash
+git clone <your-repo-url>
+cd stock-analysis-mcp
+pip install -e .[dev]
+```
+
+### MCP Client Setup (Claude Desktop)
+Add to your `claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "stock-analysis": {
+      "command": "python",
+      "args": ["-m", "main"],
+      "cwd": "/path/to/stock-analysis-mcp"
+    }
+  }
+}
+```
+
+### Basic Usage
+```python
+# Get stock price
+get_stock_price("RELIANCE")
+
+# Analyze portfolio  
+analyze_portfolio(["RELIANCE", "TCS", "HDFCBANK"])
+
+# Use predefined watchlist
+get_watchlist("nifty50")
+
+# Technical analysis
+technical_analysis(["RELIANCE", "TCS"], "3mo")
+```
+
+## ⚙️ Configuration
+
+The server uses JSON files for easy configuration:
+
+### `config.json` - Server Settings
+```json
+{
+  "server": {
+    "name": "Stock_Analysis_MCP",
+    "description": "Stock analysis server"
+  },
+  "market": {
+    "default_exchange": "NS",
+    "currency": "INR"
+  },
+  "analysis": {
+    "default_period": "1y",
+    "cache_size": 32
+  }
+}
+```
+
+### `portfolios.json` - Watchlists & Portfolios
+```json
+{
+  "watchlists": {
+    "nifty50": ["RELIANCE", "TCS", "HDFCBANK", "..."],
+    "custom_tech": ["TCS", "INFY", "WIPRO"]
+  },
+  "custom_portfolios": {
+    "conservative": {
+      "description": "Low risk portfolio",
+      "stocks": ["HDFCBANK", "TCS", "RELIANCE"],
+      "target_allocation": "optimized"
+    }
+  }
+}
+```
+
+## 🛠️ Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `get_stock_price(symbol)` | Get current stock price |
+| `get_stock_history(symbol, period)` | Get historical data |
+| `analyze_portfolio(symbols)` | Optimize portfolio allocation |
+| `get_watchlist(name)` | Get predefined watchlist |
+| `technical_analysis(symbols, period)` | Technical analysis |
+| `compare_stocks(symbol1, symbol2)` | Compare two stocks |
+| `get_server_info()` | Server capabilities |
+
+## 📊 Predefined Watchlists
+
+- **nifty50**: Top 50 NSE stocks
+- **banknifty**: Banking sector stocks  
+- **it_stocks**: IT/Technology companies
+- **pharma_stocks**: Pharmaceutical companies
+
+## 🎯 Example Use Cases
+
+### With Claude Desktop
+- *"Analyze my portfolio with Reliance, TCS, and HDFC Bank"*
+- *"What's the current price of Infosys?"*
+- *"Compare Reliance and TCS stocks"*
+- *"Show me the Nifty50 watchlist"*
+
+### Portfolio Optimization
+```python
+# Custom portfolio
+analyze_portfolio(["RELIANCE", "TCS", "HDFCBANK", "INFY", "HINDUNILVR"])
+
+# Predefined portfolio
+analyze_predefined_portfolio("conservative")
+```
+
+### Technical Analysis
+```python
+# Multi-stock analysis
+technical_analysis(["RELIANCE", "TCS"], "3mo")
+
+# Comparison analysis  
+compare_stocks_prompt("RELIANCE", "TCS")
+```
 
 ## Installation
 
-This project uses [uv](https://github.com/astral-sh/uv) for dependency management.
-
 ### Prerequisites
 
-- Python 3.9 or higher
-- uv package manager
+- Python 3.10 or higher
 
 ### Setup
 
@@ -28,25 +149,20 @@ git clone https://github.com/yourusername/stock-analysis.git
 cd stock-analysis
 ```
 
-2. Create and activate a virtual environment with uv:
+2. Create and activate a virtual environment:
 ```bash
 # Windows
-uv venv
+python -m venv .venv
 .venv\Scripts\activate
 
 # Linux/macOS
-uv venv
+python -m venv .venv
 source .venv/bin/activate
 ```
 
-3. Install dependencies:
+3. Install the package in development mode:
 ```bash
-uv pip sync requirements.txt
-```
-
-4. For development, install development dependencies:
-```bash
-uv pip sync requirements-dev.txt
+pip install -e .[dev]
 ```
 
 ## Usage

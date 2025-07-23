@@ -15,21 +15,29 @@ from scipy.optimize import minimize
 import yfinance as yf
 from mcp.server.fastmcp import FastMCP
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+from config_manager import config_manager
+
+# Configure logging from config
+log_config = config_manager.get_logging_config()
+logging.basicConfig(
+    level=getattr(logging, log_config.get("level", "INFO")),
+    format=log_config.get("format", "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+)
 logger = logging.getLogger(__name__)
 
-# Create an MCP server with a custom name
-mcp = FastMCP("Stock_Price_MCP")
+# Create an MCP server with configured name
+server_config = config_manager.get_server_config()
+mcp = FastMCP(server_config.get("name", "Stock_Analysis_MCP"))
 
 
 def normalize_symbol(symbol: str) -> str:
     """
-    Normalize a stock symbol to reflect NSE notation.
-    If a symbol does not have a suffix (e.g., '.NS' or '.BO'), append '.NS' by default.
+    Normalize a stock symbol to reflect exchange notation.
+    If a symbol does not have a suffix, append the default exchange from config.
     """
+    default_exchange = config_manager.get_default_exchange()
     if not (symbol.endswith(".NS") or symbol.endswith(".BO")):
-        symbol = f"{symbol}.NS"
+        symbol = f"{symbol}.{default_exchange}"
     return symbol
 
 
@@ -40,7 +48,7 @@ def normalize_symbols(symbols: list) -> list:
     return [normalize_symbol(s) for s in symbols]
 
 
-@lru_cache(maxsize=32)
+@lru_cache(maxsize=config_manager.get_cache_size())
 def get_multiple_tickers(symbols: tuple) -> dict:
     """
     Retrieve and cache multiple yfinance Ticker instances.
@@ -52,7 +60,9 @@ def get_multiple_tickers(symbols: tuple) -> dict:
     return ticker_dict
 
 
-def fetch_historical_data(symbols: list, period: str = "1y") -> pd.DataFrame:
+def fetch_historical_data(symbols: list, period: str = None) -> pd.DataFrame:
+    if period is None:
+        period = config_manager.get_default_period()
     normalized = normalize_symbols(symbols)
     tickers = get_multiple_tickers(tuple(normalized))
     df_list = []
@@ -142,7 +152,7 @@ def analyze_portfolio(symbols: list) -> dict:
         return {"status": "error", "message": f"Error optimizing portfolio: {str(e)}"}
 
 
-@lru_cache(maxsize=32)
+@lru_cache(maxsize=config_manager.get_cache_size())
 def get_ticker(symbol: str) -> yf.Ticker:
     """
     Retrieve and cache a yfinance Ticker instance.
@@ -357,6 +367,135 @@ def technical_analysis(symbols: list, period: str = "3mo") -> dict:
             "status": "error",
             "message": f"Error performing technical analysis: {str(e)}",
         }
+
+
+@mcp.tool()
+def get_watchlist(name: str) -> dict:
+    """
+    Get a predefined watchlist of stocks by name.
+    Available watchlists: nifty50, banknifty, it_stocks, pharma_stocks, etc.
+    """
+    try:
+        watchlists = config_manager.get_all_watchlists()
+        if name not in watchlists:
+            available = list(watchlists.keys())
+            return {
+                "status": "error",
+                "message": f"Watchlist '{name}' not found. Available: {available}"
+            }
+        
+        stocks = config_manager.get_watchlist(name)
+        return {
+            "status": "success",
+            "watchlist_name": name,
+            "stocks": stocks,
+            "count": len(stocks)
+        }
+    except Exception as e:
+        logger.exception("Error retrieving watchlist: %s", str(e))
+        return {"status": "error", "message": f"Error retrieving watchlist: {str(e)}"}
+
+
+@mcp.tool()
+def list_available_watchlists() -> dict:
+    """
+    List all available predefined watchlists.
+    """
+    try:
+        watchlists = config_manager.get_all_watchlists()
+        return {
+            "status": "success",
+            "watchlists": {name: len(stocks) for name, stocks in watchlists.items()},
+            "total_watchlists": len(watchlists)
+        }
+    except Exception as e:
+        logger.exception("Error listing watchlists: %s", str(e))
+        return {"status": "error", "message": f"Error listing watchlists: {str(e)}"}
+
+
+@mcp.tool()
+def get_custom_portfolio(name: str) -> dict:
+    """
+    Get a predefined custom portfolio configuration.
+    Available portfolios: conservative, growth, dividend, etc.
+    """
+    try:
+        portfolio = config_manager.get_custom_portfolio(name)
+        if not portfolio:
+            available = list(config_manager.get_all_custom_portfolios().keys())
+            return {
+                "status": "error",
+                "message": f"Portfolio '{name}' not found. Available: {available}"
+            }
+        
+        return {
+            "status": "success",
+            "portfolio_name": name,
+            "description": portfolio.get("description", ""),
+            "stocks": portfolio.get("stocks", []),
+            "target_allocation": portfolio.get("target_allocation", "optimized")
+        }
+    except Exception as e:
+        logger.exception("Error retrieving portfolio: %s", str(e))
+        return {"status": "error", "message": f"Error retrieving portfolio: {str(e)}"}
+
+
+@mcp.tool()
+def analyze_predefined_portfolio(portfolio_name: str) -> dict:
+    """
+    Analyze a predefined portfolio from the portfolios.json configuration.
+    """
+    try:
+        portfolio = config_manager.get_custom_portfolio(portfolio_name)
+        if not portfolio:
+            available = list(config_manager.get_all_custom_portfolios().keys())
+            return {
+                "status": "error",
+                "message": f"Portfolio '{portfolio_name}' not found. Available: {available}"
+            }
+        
+        stocks = portfolio.get("stocks", [])
+        return analyze_portfolio(stocks)
+    except Exception as e:
+        logger.exception("Error analyzing predefined portfolio: %s", str(e))
+        return {"status": "error", "message": f"Error analyzing portfolio: {str(e)}"}
+
+
+@mcp.tool()
+def get_server_info() -> dict:
+    """
+    Get information about the MCP server configuration and capabilities.
+    """
+    try:
+        server_config = config_manager.get_server_config()
+        market_config = config_manager.get_market_config()
+        analysis_config = config_manager.get_analysis_config()
+        
+        return {
+            "status": "success",
+            "server": {
+                "name": server_config.get("name", "Stock_Analysis_MCP"),
+                "description": server_config.get("description", ""),
+                "version": server_config.get("version", "1.0.0")
+            },
+            "market": {
+                "default_exchange": market_config.get("default_exchange", "NS"),
+                "currency": market_config.get("currency", "INR"),
+                "timezone": market_config.get("timezone", "Asia/Kolkata")
+            },
+            "capabilities": {
+                "portfolio_optimization": True,
+                "technical_analysis": True,
+                "historical_data": True,
+                "real_time_prices": True,
+                "predefined_watchlists": len(config_manager.get_all_watchlists()),
+                "custom_portfolios": len(config_manager.get_all_custom_portfolios())
+            },
+            "available_periods": analysis_config.get("historical_periods", ["1d", "1mo", "3mo", "1y"])
+        }
+    except Exception as e:
+        logger.exception("Error getting server info: %s", str(e))
+        return {"status": "error", "message": f"Error getting server info: {str(e)}"}
 
 
 if __name__ == "__main__":

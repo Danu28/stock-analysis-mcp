@@ -1,0 +1,34 @@
+{
+  "server": {
+    "name": "Stock_Analysis_MCP",
+    "description": "Stock analysis and portfolio optimization for NSE/BSE markets",
+    "version": "1.0.0",
+    "host": "localhost",
+    "port": 8000
+  },
+  "market": {
+    "default_exchange": "NS",
+    "currency": "INR",
+    "timezone": "Asia/Kolkata",
+    "trading_hours": {
+      "start": "09:15",
+      "end": "15:30"
+    }
+  },
+  "analysis": {
+    "default_period": "1y",
+    "cache_size": 32,
+    "historical_periods": ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y"],
+    "technical_analysis_period": "3mo"
+  },
+  "portfolio": {
+    "optimization_method": "sharpe_ratio",
+    "min_weight_threshold": 0.01,
+    "max_positions": 10
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "file": null
+  }
+}

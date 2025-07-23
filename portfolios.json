@@ -1,0 +1,49 @@
+{
+  "watchlists": {
+    "nifty50": [
+      "RELIANCE", "TCS", "HDFCBANK", "INFY", "HINDUNILVR", "ICICIBANK", "HDFC", "ITC", 
+      "SBIN", "BHARTIARTL", "ASIANPAINT", "MARUTI", "BAJFINANCE", "LT", "TECHM",
+      "HCLTECH", "WIPRO", "ULTRACEMCO", "SUNPHARMA", "ONGC", "NTPC", "TITAN",
+      "NESTLEIND", "DIVISLAB", "KOTAKBANK", "POWERGRID", "BAJAJFINSV", "M&M",
+      "TATASTEEL", "AXISBANK", "HDFCLIFE", "SBILIFE", "BRITANNIA", "COALINDIA",
+      "DRREDDY", "GRASIM", "INDUSINDBK", "EICHERMOT", "UPL", "ADANIPORTS",
+      "BAJAJ-AUTO", "HINDALCO", "JSWSTEEL", "TATACONSUM", "HEROMOTOCO",
+      "BPCL", "CIPLA", "TATAMOTORS", "APOLLOHOSP", "IOC"
+    ],
+    "banknifty": [
+      "HDFCBANK", "ICICIBANK", "SBIN", "KOTAKBANK", "AXISBANK", "INDUSINDBK",
+      "FEDERALBNK", "RBLBANK", "BANDHANBNK", "IDFCFIRSTB", "PNB", "BANKBARODA"
+    ],
+    "it_stocks": [
+      "TCS", "INFY", "HCLTECH", "WIPRO", "TECHM", "LTIM", "MPHASIS", 
+      "MINDTREE", "COFORGE", "PERSISTENT"
+    ],
+    "pharma_stocks": [
+      "SUNPHARMA", "DIVISLAB", "DRREDDY", "CIPLA", "AUROPHARMA", "LUPIN",
+      "BIOCON", "CADILAHC", "TORNTPHARM", "ALKEM"
+    ]
+  },
+  "custom_portfolios": {
+    "conservative": {
+      "description": "Low risk, steady returns portfolio",
+      "stocks": ["HDFCBANK", "TCS", "RELIANCE", "ITC", "HINDUNILVR"],
+      "target_allocation": {
+        "HDFCBANK": 0.25,
+        "TCS": 0.25,
+        "RELIANCE": 0.20,
+        "ITC": 0.15,
+        "HINDUNILVR": 0.15
+      }
+    },
+    "growth": {
+      "description": "High growth potential portfolio",
+      "stocks": ["INFY", "TECHM", "BAJFINANCE", "ASIANPAINT", "TITAN"],
+      "target_allocation": "optimized"
+    },
+    "dividend": {
+      "description": "High dividend yield portfolio", 
+      "stocks": ["ITC", "SBIN", "ONGC", "NTPC", "POWERGRID"],
+      "target_allocation": "equal_weight"
+    }
+  }
+}
