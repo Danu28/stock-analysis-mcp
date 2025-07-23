@@ -3,18 +3,17 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "stock-analysis"
+name = "stock-analysis-mcp"
 version = "0.1.0"
-description = "A comprehensive stock analysis tool with portfolio optimization and technical analysis capabilities"
+description = "A comprehensive stock analysis MCP server with portfolio optimization and technical analysis capabilities"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Danu28", email = "your.email@example.com"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Financial and Insurance Industry",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -30,6 +29,10 @@ dependencies = [
     "fastmcp>=0.1.0",
 ]
 
+[tool.setuptools]
+# Explicitly define the modules to avoid discovery issues
+py-modules = ["main", "config_manager"]
+
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
@@ -42,9 +45,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/stock-analysis"
-Repository = "https://github.com/yourusername/stock-analysis.git"
-Issues = "https://github.com/yourusername/stock-analysis/issues"
+Homepage = "https://github.com/Danu28/stock-analysis-mcp"
+Repository = "https://github.com/Danu28/stock-analysis-mcp.git"
+Issues = "https://github.com/Danu28/stock-analysis-mcp/issues"
 
 [tool.black]
 line-length = 88
